@@ -28,8 +28,8 @@ app.get('*', (_req, res) => {
 app.use('', api_1.welcomeApi);
 app.use('/tesseract', api_1.tesseractApi);
 // Start server
-app.listen(process.env.SERVER_PORT, () => {
+app.listen(process.env.PORT, () => {
     // tslint:disable-next-line: no-console
-    console.log(`OCR Server is listening at port ${process.env.SERVER_PORT}`);
+    console.log(`OCR Server is listening at port ${process.env.PORT}`);
 });
 exports.default = app;
