@@ -1,8 +1,10 @@
 import type { OCRRequestType } from '../../types';
 
+const url = process.env.NODE_ENV === "production" ? "https://my-ocr-friend.herokuapp.com/tesseract/read-image" : "http://localhost:5000/tesseract/read-image";
+
 export const makeRequest: OCRRequestType = async (data, fallback) => {
     try {
-        const response = await fetch('http://localhost:80/tesseract/read-image', {
+        const response = await fetch(url, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
