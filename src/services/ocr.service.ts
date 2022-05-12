@@ -2,7 +2,7 @@ import { createWorker } from "tesseract.js";
 import { ReadingImageProgress } from "../interfaces/reading-image-progress";
 
 export class OCRService {
-	static async readImage(
+	public static async readImage(
 		imagePath: string,
 		onProgress?: (status: ReadingImageProgress) => void
 	): Promise<string> {
