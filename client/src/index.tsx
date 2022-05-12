@@ -1,20 +1,18 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import './index.css';
+import { StrictMode, lazy, Suspense } from "react";
+import { createRoot } from "react-dom/client";
+import { LoadingSpinner } from "./components/shared/LoadingSpinner";
+import "./index.css";
 
-import App from './components/App';
-import ThemeProvider from './components/context/ThemeContext';
-import ToastProvider from './components/context/ToastContext';
+const LazyApp = lazy(() => import("./components/LazyApp"));
 
-const container = document.getElementById('root') as HTMLDivElement;
+const container = document.getElementById("root") as HTMLDivElement;
 const root = createRoot(container);
 
 root.render(
-  <StrictMode>
-    <ToastProvider>
-      <ThemeProvider initialTheme="light">
-        <App />
-      </ThemeProvider>
-    </ToastProvider>
-  </StrictMode>
+	<StrictMode>
+		{/* <LoadingSpinner /> */}
+		<Suspense fallback={<LoadingSpinner />}>
+			<LazyApp />
+		</Suspense>
+	</StrictMode>
 );
