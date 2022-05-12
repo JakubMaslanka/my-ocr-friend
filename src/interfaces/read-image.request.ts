@@ -1,3 +1,3 @@
 export interface ReadImageRequest {
-  imageUrl: string;
+	imageUrl: string;
 }

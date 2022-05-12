@@ -1,1 +1,1 @@
-export { validationHandler } from './validation-handler';
+export { validationHandler } from "./validation-handler";

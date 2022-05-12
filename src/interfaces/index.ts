@@ -1,1 +1,1 @@
-export { ReadImageRequest } from './read-image.request';
+export { ReadImageRequest } from "./read-image.request";

@@ -1,2 +1,1 @@
-export { tesseractApi } from './tesseract.api';
-export { welcomeApi } from './welcome.api';
+export { tesseractApi } from "./tesseract.api";
