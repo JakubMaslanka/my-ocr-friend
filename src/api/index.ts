@@ -1,1 +1,1 @@
-export { tesseractApi } from "./tesseract.api";
+export { ocrApi } from "./ocr.api";

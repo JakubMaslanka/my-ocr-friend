@@ -1,7 +1,7 @@
 import { createWorker } from "tesseract.js";
 import { ReadingImageProgress } from "../interfaces/reading-image-progress";
 
-export class TesseractService {
+export class OCRService {
 	static async readImage(
 		imagePath: string,
 		onProgress?: (status: ReadingImageProgress) => void
@@ -15,9 +15,5 @@ export class TesseractService {
 		await worker.initialize("eng");
 
 		return worker.recognize(imagePath).then((value) => value.data.text);
-	}
-
-	static async readSeveralImages(imageList: string[]): Promise<string[]> {
-		return [];
 	}
 }

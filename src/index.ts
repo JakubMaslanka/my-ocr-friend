@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import path from "path";
 import cors from "cors";
-import { tesseractApi } from "./api";
+import { ocrApi } from "./api";
 import { appSetup } from "./config";
 
 const app = express();
@@ -23,7 +23,7 @@ app.get("*", (_req, res) => {
 	res.sendFile(path.join(__dirname, "../client", "build", "index.html"));
 });
 
-app.use("/tesseract", tesseractApi);
+app.use("/ocr", ocrApi);
 
 // Start server
 app.listen(process.env.PORT, () => {

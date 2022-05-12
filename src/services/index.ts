@@ -1,1 +1,1 @@
-export { TesseractService } from "./tesseract.service";
+export { OCRService } from "./ocr.service";
