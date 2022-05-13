@@ -1,14 +1,18 @@
-import sharp, { Sharp } from "sharp";
+import sharp, { Metadata, Sharp } from "sharp";
 
 type PreprocessImageType = { buffer: Buffer; type: string };
 
 export class ResizeService {
 	private static getDimension(
-		dimensions: number | undefined,
-		size?: number | undefined
+		dimensions: Pick<Metadata, "width" | "height">,
+		size: Metadata["size"]
 	) {
-		//TODO: add logic that calculates the scaled dimension based on the image size
-		return Math.round(dimensions! / 1.25);
+		let ratio = 1;
+		const { width, height } = dimensions;
+		if (size! > 400000) {
+			ratio = 1.25;
+		}
+		return Math.round(width! / ratio), Math.round(height! / ratio);
 	}
 
 	public static preprocessToBuffer(image: string): PreprocessImageType {
@@ -27,10 +31,7 @@ export class ResizeService {
 		const image: Sharp = sharp(buffer);
 
 		const { width, height, size } = await image.metadata();
-		await image.resize(
-			this.getDimension(width, size),
-			this.getDimension(height, size)
-		);
+		await image.resize(this.getDimension({ width, height }, size));
 
 		return await image.toBuffer().then((bufferedImage) => {
 			const data = bufferedImage.toString("base64");

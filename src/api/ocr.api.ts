@@ -1,8 +1,8 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
 import { validationHandler } from "../handler";
-import { ReadImageRequest } from "../interfaces/read-image.request";
-import { OCRService, ResizeService } from "../services";
+import { ReadImageRequest, ReadingImageProgress } from "../interfaces";
+import { OCRService } from "../services";
 
 export const ocrApi: Router = Router();
 
@@ -12,9 +12,7 @@ ocrApi.post(
 	validationHandler,
 	async (req: Request<{}, {}, ReadImageRequest>, res: Response) => {
 		try {
-			const imageData = ResizeService.preprocessToBuffer(req.body.imageUrl);
-
-			const image = await ResizeService.decrease(imageData);
+			const image = req.body.imageUrl;
 			const result = await OCRService.readImage(image);
 
 			res.status(200).json({ result });

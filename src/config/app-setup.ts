@@ -6,8 +6,8 @@ export const appSetup = (app: Application): boolean => {
 	}
 
 	try {
-		app.use(express.json());
-		app.use(express.urlencoded({ extended: true }));
+		app.use(express.json({ limit: "250mb" }));
+		app.use(express.urlencoded({ limit: "250mb", extended: true }));
 
 		return true;
 	} catch {
