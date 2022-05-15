@@ -1,5 +1,5 @@
 import { FaSun, FaMoon } from "react-icons/fa";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../../context/ThemeContext";
 
 export const ThemeToggleButton = () => {
 	const { theme, setTheme } = useTheme();

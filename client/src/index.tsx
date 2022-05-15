@@ -10,7 +10,6 @@ const root = createRoot(container);
 
 root.render(
 	<StrictMode>
-		{/* <LoadingSpinner /> */}
 		<Suspense fallback={<LoadingSpinner />}>
 			<LazyApp />
 		</Suspense>

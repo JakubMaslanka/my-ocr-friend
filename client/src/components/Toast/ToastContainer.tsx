@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { AiOutlineClose } from "react-icons/ai";
-import { useToast } from "../context/ToastContext";
+import { useToast } from "../../context/ToastContext";
+import { toastVariants } from "../app.animations";
 
 interface IToast {
 	id: number;
@@ -11,15 +13,20 @@ interface IToast {
 
 const ToastContainer: React.FC<{ toasts: IToast[] }> = ({ toasts }) =>
 	createPortal(
-		<div className="absolute m-4 right-0 top-0 z-40 overflow-hidden">
-			{toasts.map((toast: IToast) => (
-				<Toast
-					key={toast.id}
-					id={toast.id}
-					type={toast.type}
-					message={toast.content}
-				/>
-			))}
+		<div className="absolute m-4 right-0 top-0 z-40 overflow-y-hiddendd">
+			<AnimatePresence>
+				{toasts.map((toast: IToast) => (
+					<motion.div
+						key={toast.id}
+						variants={toastVariants}
+						initial="hidden"
+						animate="show"
+						exit="exit"
+					>
+						<Toast id={toast.id} type={toast.type} message={toast.content} />
+					</motion.div>
+				))}
+			</AnimatePresence>
 		</div>,
 		document.getElementById("toast-root") as HTMLDivElement
 	);

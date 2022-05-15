@@ -10,8 +10,8 @@ var appSetup = function (app) {
         return false;
     }
     try {
-        app.use(express_1.default.json());
-        app.use(express_1.default.urlencoded({ extended: true }));
+        app.use(express_1.default.json({ limit: "250mb" }));
+        app.use(express_1.default.urlencoded({ limit: "250mb", extended: true }));
         return true;
     }
     catch (_a) {

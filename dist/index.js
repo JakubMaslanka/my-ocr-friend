@@ -21,7 +21,7 @@ app.use(express_1.default.static(path_1.default.join(__dirname, "../client", "bu
 app.get("*", function (_req, res) {
     res.sendFile(path_1.default.join(__dirname, "../client", "build", "index.html"));
 });
-app.use("/tesseract", api_1.tesseractApi);
+app.use("/ocr", api_1.ocrApi);
 app.listen(process.env.PORT, function () {
     console.log("OCR Server is listening at port ".concat(process.env.PORT));
 });

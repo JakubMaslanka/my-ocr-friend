@@ -1,6 +1,6 @@
 import App from "./App";
-import ThemeProvider from "./context/ThemeContext";
-import ToastProvider from "./context/ToastContext";
+import ThemeProvider from "../context/ThemeContext";
+import ToastProvider from "../context/ToastContext";
 
 const LazyApp = () => (
 	<ToastProvider>
