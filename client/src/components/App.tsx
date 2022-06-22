@@ -53,6 +53,7 @@ function App() {
 
 	const { ocrText, isConverting, convertingProgress } = state;
 	const { addToast } = useToast();
+	const [history, setHistory] = useLocalStorage("history", "");
 
 	const handleConvert = () => {
 		if (!editableDiv.current!.hasChildNodes()) {
@@ -71,6 +72,11 @@ function App() {
 		)
 			.then((data: APIResponse | void) => {
 				addToast("The photo was converted correctly!", "success");
+				setHistory((prevState) =>
+					[JSON.stringify({ ...data, date: new Date(Date.now()) })].concat(
+						prevState
+					)
+				);
 				dispatch({ type: "success", result: data! });
 			})
 			.catch((err: unknown) =>
@@ -129,7 +135,7 @@ function App() {
 	return (
 		<main className="dark:bg-gray-800 font-mono bg-white relative overflow-x-hidden">
 			<SlideButtonOpen setOpen={setOpen} />
-			<SlideOver open={open} setOpen={setOpen} />
+			<SlideOver open={open} setOpen={setOpen} history={history} />
 			<Header />
 			<motion.div
 				variants={mainSection}
@@ -248,11 +254,11 @@ const SlideButtonOpen: React.FC<{
 						style={{
 							borderBottomRightRadius: "100%"
 						}}
-						className="absolute top-0 left-0 w-8 h-8 dark:bg-gray-800 bg-white"
+						className="absolute top-[-1px] left-[-1px] w-full h-[34px] z-10 dark:bg-gray-800 bg-white border-0"
 					></div>
 				</div>
 				<p
-					className="transform cursor-pointer rotate-180 px-3 py-4 rounded-r-lg bg-fuchsia-400 dark:text-white text-gray-800 text-xs leading-3 font-sans font-semibold"
+					className="transform cursor-pointer rotate-180 z-30 px-3 py-4 rounded-r-lg bg-fuchsia-400 dark:text-white text-gray-800 text-xs leading-3 font-sans font-semibold"
 					style={{ writingMode: "vertical-rl" }}
 				>
 					History
@@ -262,7 +268,7 @@ const SlideButtonOpen: React.FC<{
 						style={{
 							borderTopRightRadius: "100%"
 						}}
-						className="absolute bottom-0 left-0 w-8 h-8 dark:bg-gray-800 bg-white"
+						className="absolute bottom-[-1px] left-[-1px] w-full h-[34px] dark:bg-gray-800 bg-white"
 					></div>
 				</div>
 			</div>
@@ -273,12 +279,11 @@ const SlideButtonOpen: React.FC<{
 const SlideOver: React.FC<{
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ open, setOpen }) => {
-	const [history, setHistory] = useLocalStorage("history", "");
-
+	history: Array<string>;
+}> = ({ open, setOpen, history }) => {
 	return (
 		<Transition.Root show={open} as={Fragment}>
-			<Dialog as="div" className="relative z-50" onClose={setOpen}>
+			<Dialog as="div" className="relative z-50 font-sans" onClose={setOpen}>
 				<Transition.Child
 					as={Fragment}
 					enter="ease-in-out duration-500"
@@ -313,7 +318,7 @@ const SlideOver: React.FC<{
 												<div className="ml-3 flex h-7 items-center">
 													<button
 														type="button"
-														className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+														className="rounded-md bg-white text-gray-400 hover:text-gray-500 outline-none"
 														onClick={() => setOpen(false)}
 													>
 														<span className="sr-only">Close panel</span>
@@ -328,12 +333,28 @@ const SlideOver: React.FC<{
 										<div className="relative mt-6 flex-1 px-4 sm:px-6">
 											{/* Replace with your content */}
 											{!history && <SlideOverEmptyState />}
-											{/* <div className="absolute inset-0 px-4 sm:px-6">
-												<div
-													className="h-full border-2 border-dashed border-gray-200"
-													aria-hidden="true"
-												/>
-											</div> */}
+											<ul className="divide-y divide-gray-200">
+												{history.map((his, idx) => {
+													const element: { result: string; date: string } =
+														JSON.parse(his);
+
+													return (
+														<li key={idx} className="py-4">
+															<time
+																dateTime={element.date}
+																className="block whitespace-nowrap text-sm text-gray-500 text-right"
+															>
+																{new Date(element.date).toLocaleDateString()}
+															</time>
+															<div className="mt-1">
+																<p className="line-clamp-2 text-sm text-gray-600">
+																	{element.result}
+																</p>
+															</div>
+														</li>
+													);
+												})}
+											</ul>
 											{/* /End replace */}
 										</div>
 									</div>
@@ -349,33 +370,20 @@ const SlideOver: React.FC<{
 
 const SlideOverEmptyState = () => {
 	return (
-		<div className="flex flex-col items-center sth-full text-center">
-			<svg
-				className="mx-auto h-12 w-12 text-gray-400"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				aria-hidden="true"
-			>
-				<path
-					vectorEffect="non-scaling-stroke"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					strokeWidth={2}
-					d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-				/>
-			</svg>
-			<h3 className="mt-2 text-sm font-medium text-gray-900">No projects</h3>
+		<div className="flex flex-col justify-center items-center h-full text-center">
+			<h3 className="mt-2 text-sm font-medium text-gray-900">No history</h3>
 			<p className="mt-1 text-sm text-gray-500">
-				Get started by creating a new project.
+				<span>Looks like your are new here.</span>
+				<br />
+				<span>Get started by converting a first image.</span>
 			</p>
 			<div className="mt-6">
 				<button
 					type="button"
-					className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+					className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-fuchsia-400 hover:bg-fuchsia-700 transition-colors duration-100 ease-in-out"
 				>
 					<AiOutlinePlus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-					New Project
+					Convert Image
 				</button>
 			</div>
 		</div>
