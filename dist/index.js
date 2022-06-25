@@ -17,6 +17,9 @@ if (!(0, config_1.appSetup)(app)) {
 if (process.env.NODE_ENV === "development") {
     app.use((0, cors_1.default)());
 }
+else {
+    app.use(config_1.redirectToHttps);
+}
 app.use(express_1.default.static(path_1.default.join(__dirname, "../client", "build")));
 app.get("*", function (_req, res) {
     res.sendFile(path_1.default.join(__dirname, "../client", "build", "index.html"));

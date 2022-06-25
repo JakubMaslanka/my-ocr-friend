@@ -3,7 +3,7 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import { ocr } from "./controllers";
-import { appSetup } from "./config";
+import { appSetup, redirectToHttps } from "./config";
 
 const app = express();
 
@@ -15,6 +15,8 @@ if (!appSetup(app)) {
 
 if (process.env.NODE_ENV === "development") {
   app.use(cors());
+} else {
+  app.use(redirectToHttps);
 }
 
 app.use(express.static(path.join(__dirname, "../client", "build")));
