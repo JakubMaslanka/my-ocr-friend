@@ -1,10 +1,10 @@
-import { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { tooltipVaritans } from "../app.animations";
 
 export const Tooltip: React.FC<{
 	tooltipText: string;
-	children: JSX.Element;
+	children: ReactNode;
 }> = ({ tooltipText, children, ...rest }) => {
 	const [showTooltip, setShowTooltip] = useState(false);
 
@@ -22,7 +22,7 @@ export const Tooltip: React.FC<{
 						initial="hidden"
 						animate="show"
 						exit="exit"
-						className="absolute w-24 text-sm text-center bg-gray-600 dark:bg-gray-200 text-gray-200 dark:text-gray-900 -top-14 -left-8 p-1 border overflow-hidden border-gray-300 rounded-lg shadow-md"
+						className="absolute -top-14 -left-8 w-24 overflow-hidden rounded-lg border border-gray-300 bg-gray-600 p-1 text-center text-sm text-gray-200 shadow-md dark:bg-gray-200 dark:text-gray-900"
 					>
 						{tooltipText}
 					</motion.div>

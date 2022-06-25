@@ -31,21 +31,18 @@ const ThemeContext = React.createContext<ThemeContextType>({
 	setTheme: () => console.log("test")
 });
 
-const ThemeProvider: React.FC<IThemeProvider> = ({
-	initialTheme,
-	children
-}) => {
+const rawSetTheme = (rawTheme: string) => {
+	const root = window.document.documentElement;
+	const isDark = rawTheme === "dark";
+
+	root.classList.remove(isDark ? "light" : "dark");
+	root.classList.add(rawTheme);
+
+	localStorage.setItem("color-theme", rawTheme);
+};
+
+const ThemeProvider: React.FC<IThemeProvider> = ({ initialTheme, children }) => {
 	const [theme, setTheme] = React.useState(getInitialTheme);
-
-	const rawSetTheme = (rawTheme: string) => {
-		const root = window.document.documentElement;
-		const isDark = rawTheme === "dark";
-
-		root.classList.remove(isDark ? "light" : "dark");
-		root.classList.add(rawTheme);
-
-		localStorage.setItem("color-theme", rawTheme);
-	};
 
 	if (initialTheme) {
 		rawSetTheme(initialTheme);
@@ -55,11 +52,7 @@ const ThemeProvider: React.FC<IThemeProvider> = ({
 		rawSetTheme(theme);
 	}, [theme]);
 
-	return (
-		<ThemeContext.Provider value={{ theme, setTheme }}>
-			{children}
-		</ThemeContext.Provider>
-	);
+	return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };
 
 const useTheme = () => {

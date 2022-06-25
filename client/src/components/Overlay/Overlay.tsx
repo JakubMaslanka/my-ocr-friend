@@ -4,11 +4,11 @@ import { OverlayContext } from "../../context/OverlayContext";
 import { OverlayProps } from "./Overlay.props";
 
 const Overlay: React.FC<OverlayProps> = ({ children, isOpen }) => {
-	const overlayRootRef = useContext(OverlayContext);
+	const overlayRootReference = useContext(OverlayContext);
 
 	return isOpen
-		? createPortal(<Fragment>{children}</Fragment>, overlayRootRef!.current!)
-		: null;
+		? createPortal(<Fragment>{children}</Fragment>, overlayRootReference!.current!)
+		: undefined;
 };
 
 export default Overlay;

@@ -1,9 +1,9 @@
-import { Fragment, useEffect, useReducer, useRef, useState } from "react";
+import React, { Fragment, useEffect, useReducer, useRef, useState } from "react";
 
 import { motion } from "framer-motion";
 import { IoMdCopy } from "react-icons/io";
 import { MdOutlineTranslate } from "react-icons/md";
-import { AiOutlinePlus } from "react-icons/ai";
+import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 
 import { Footer, Header } from "./page";
 import { useToast } from "../context/ToastContext";
@@ -14,7 +14,6 @@ import { mainChildrenVariants, mainSection } from "./app.animations";
 import type { StateType, ActionType, APIResponse } from "../types";
 
 import { Dialog, Transition } from "@headlessui/react";
-import { AiOutlineClose } from "react-icons/ai";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 
 function reducer(state: StateType, action: ActionType): StateType {
@@ -30,7 +29,7 @@ function reducer(state: StateType, action: ActionType): StateType {
 				ocrText: action.result
 			};
 		case "reset":
-			return { isConverting: false, convertingProgress: 0, ocrText: null };
+			return { isConverting: false, convertingProgress: 0, ocrText: undefined };
 		default:
 			return state;
 	}
@@ -40,16 +39,12 @@ function App() {
 	const initialState = {
 		isConverting: false,
 		convertingProgress: 0,
-		ocrText: null
+		ocrText: undefined
 	};
 	const [state, dispatch] = useReducer(reducer, initialState);
 
-	const intervalID = useRef(undefined) as React.MutableRefObject<
-		number | undefined
-	>;
-	const editableDiv = useRef(
-		null
-	) as React.MutableRefObject<HTMLDivElement | null>;
+	const intervalID = useRef() as React.MutableRefObject<number | undefined>;
+	const editableDiv = useRef(null) as React.MutableRefObject<HTMLDivElement | null>;
 
 	const { ocrText, isConverting, convertingProgress } = state;
 	const { addToast } = useToast();
@@ -60,52 +55,45 @@ function App() {
 			addToast("There is no picture in the zone!", "danger");
 			return;
 		}
-		const imageRef = editableDiv.current!.children[0] as HTMLImageElement;
-		if (!imageRef || !imageRef.src) {
+		const imageReference = editableDiv.current!.children[0] as HTMLImageElement;
+		if (!imageReference || !imageReference.src) {
 			addToast("Content to convert is invalid. Change it!", "danger");
 			return;
 		}
 		dispatch({ type: "request" });
 
-		makeRequest({ imageUrl: imageRef.src }, (error: unknown) =>
+		makeRequest({ imageUrl: imageReference.src }, (error: unknown) =>
 			addToast(`Internal server error, message: ${error}`, "error")
 		)
-			.then((data: APIResponse | void) => {
+			.then((data: APIResponse) => {
 				addToast("The photo was converted correctly!", "success");
-				setHistory((prevState) =>
-					[JSON.stringify({ ...data, date: new Date(Date.now()) })].concat(
-						prevState
-					)
-				);
+				setHistory((previousState) => [
+					JSON.stringify({ ...data, date: new Date(Date.now()) }),
+					...previousState
+				]);
 				dispatch({ type: "success", result: data! });
 			})
-			.catch((err: unknown) =>
-				addToast(`Something went wrong, error message: ${err}`, "error")
+			.catch((error: unknown) =>
+				addToast(`Something went wrong, error message: ${error}`, "error")
 			);
 	};
 
 	const handleReset = () => {
 		if (intervalID.current !== null) clearInterval(intervalID.current);
 		if (editableDiv.current!.hasChildNodes()) {
-			Array.from(editableDiv.current!.children).forEach((child) =>
-				child.remove()
-			);
+			for (const child of editableDiv.current!.children) {
+				child.remove();
+			}
 		}
 		dispatch({ type: "reset" });
 	};
 
 	const copyToClipboard = () =>
 		handleClipboard(ocrText!.result, () =>
-			addToast(
-				"The result was not copied to the clipboard. Error occured.",
-				"danger"
-			)
+			addToast("The result was not copied to the clipboard. Error occured.", "danger")
 		)
 			.then(() => {
-				addToast(
-					"The text was successfully copied to the clipboard!",
-					"success"
-				);
+				addToast("The text was successfully copied to the clipboard!", "success");
 			})
 			.catch(() => {
 				addToast("Something went wrong while copying the result!", "error");
@@ -133,7 +121,7 @@ function App() {
 	const [open, setOpen] = useState(false);
 
 	return (
-		<main className="dark:bg-gray-800 font-mono bg-white relative overflow-x-hidden">
+		<main className="relative overflow-x-hidden bg-white font-mono dark:bg-gray-800">
 			<SlideButtonOpen setOpen={setOpen} />
 			<SlideOver open={open} setOpen={setOpen} history={history} />
 			<Header />
@@ -142,39 +130,34 @@ function App() {
 				initial="hidden"
 				animate="show"
 				exit="exit"
-				className="flex relative z-20 items-center"
+				className="relative z-20 flex items-center"
 			>
-				<div className="container mx-auto px-6 flex flex-col justify-between items-center relative py-4">
+				<div className="container relative mx-auto flex flex-col items-center justify-between px-6 py-4">
 					<div className="flex flex-col">
 						<motion.h2
 							variants={mainChildrenVariants}
-							className="max-w-3xl text-2xl md:text-3xl font-bold mx-auto dark:text-white text-gray-800 text-center py-2"
+							className="mx-auto max-w-3xl py-2 text-center text-2xl font-bold text-gray-800 dark:text-white md:text-3xl"
 						>
-							<span className="text-fuchsia-400">MY-OCR-FRIEND</span> is a web
-							app allowing you to convert image into text.
+							<span className="text-fuchsia-400">MY-OCR-FRIEND</span> is a web app allowing you to
+							convert image into text.
 							<br />
-							<span className="text-fuchsia-300">
-								Try it out, just paste image!
-							</span>
+							<span className="text-fuchsia-300">Try it out, just paste image!</span>
 						</motion.h2>
 						<motion.div variants={mainChildrenVariants}>
-							<p className="text-lg my-8 font-medium text-center dark:text-white">
+							<p className="my-8 text-center text-lg font-medium dark:text-white">
 								Your image needs to be on your&#x27;s clipboard!
 							</p>
-							<p className="text-sm -mt-8 font-extralight text-center dark:text-white">
+							<p className="-mt-8 text-center text-sm font-extralight dark:text-white">
 								The written text should be in English.
 							</p>
 						</motion.div>
 						<motion.div variants={mainChildrenVariants} className="my-8">
-							<label
-								className="text-xs font-extrabold text-fuchsia-400 py-2"
-								htmlFor="content"
-							>
+							<label className="py-2 text-xs font-extrabold text-fuchsia-400" htmlFor="content">
 								Paste image here:
 							</label>
 							<div
 								id="content"
-								className="h-28 max-w-3xl mb-8 mt-0 p-4 border border-fuchsia-500 shadow-lg outline-none overflow-y-scroll"
+								className="mb-8 mt-0 h-28 max-w-3xl overflow-y-scroll border border-fuchsia-500 p-4 shadow-lg outline-none"
 								contentEditable={true}
 								ref={editableDiv}
 							></div>
@@ -192,18 +175,15 @@ function App() {
 
 						{ocrText?.result && (
 							<motion.div variants={mainChildrenVariants}>
-								<div className="flex flex-row justify-between items-center">
-									<label
-										className="text-md font-extrabold text-fuchsia-400 pt-2"
-										htmlFor="content"
-									>
+								<div className="flex flex-row items-center justify-between">
+									<label className="text-md pt-2 font-extrabold text-fuchsia-400" htmlFor="content">
 										Result:
 									</label>
 									<div className="flex flex-row gap-4">
 										<Tooltip tooltipText="Copy to clipboard">
 											<div
 												onClick={copyToClipboard}
-												className="bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 hover:bg-gray-300 transition-all duration-100 p-2 rounded-lg shadow-md cursor-pointer"
+												className="cursor-pointer rounded-lg bg-gray-200 p-2 shadow-md transition-all duration-100 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
 											>
 												<span className="text-gray-800 dark:text-gray-200">
 													<IoMdCopy />
@@ -213,7 +193,7 @@ function App() {
 										<Tooltip tooltipText="Translate text">
 											<div
 												onClick={openTextInTranslator}
-												className="bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 hover:bg-gray-300 transition-all duration-100 p-2 rounded-lg shadow-md cursor-pointer"
+												className="cursor-pointer rounded-lg bg-gray-200 p-2 shadow-md transition-all duration-100 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
 											>
 												<span className="text-gray-800 dark:text-gray-200">
 													<MdOutlineTranslate />
@@ -222,8 +202,8 @@ function App() {
 										</Tooltip>
 									</div>
 								</div>
-								<div className="max-w-3xl my-4 p-2 border border-fuchsia-500 shadow-lg outline-none relative">
-									<span className="font-medium text-lg text-black dark:text-white">
+								<div className="relative my-4 max-w-3xl border border-fuchsia-500 p-2 shadow-lg outline-none">
+									<span className="text-lg font-medium text-black dark:text-white">
 										{ocrText.result}
 									</span>
 								</div>
@@ -244,31 +224,28 @@ const SlideButtonOpen: React.FC<{
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({ setOpen }) => {
 	return (
-		<div className="absolute right-0 h-screen w-8 z-50 flex items-center justify-center">
-			<div
-				onClick={() => setOpen(true)}
-				className="inline-block cursor-pointer"
-			>
-				<div className="h-8 w-full bg-fuchsia-400 relative">
+		<div className="absolute right-0 z-50 flex h-screen w-8 items-center justify-center">
+			<div onClick={() => setOpen(true)} className="inline-block cursor-pointer">
+				<div className="relative h-8 w-full bg-fuchsia-400">
 					<div
 						style={{
 							borderBottomRightRadius: "100%"
 						}}
-						className="absolute top-[-1px] left-[-1px] w-full h-[34px] z-10 dark:bg-gray-800 bg-white border-0"
+						className="absolute top-[-1px] left-[-1px] z-10 h-[34px] w-full border-0 bg-white dark:bg-gray-800"
 					></div>
 				</div>
 				<p
-					className="transform cursor-pointer rotate-180 z-30 px-3 py-4 rounded-r-lg bg-fuchsia-400 dark:text-white text-gray-800 text-xs leading-3 font-sans font-semibold"
+					className="z-30 rotate-180 transform cursor-pointer rounded-r-lg bg-fuchsia-400 px-3 py-4 font-sans text-xs font-semibold leading-3 text-gray-800 dark:text-white"
 					style={{ writingMode: "vertical-rl" }}
 				>
 					History
 				</p>
-				<div className="h-8 w-full bg-fuchsia-400 relative">
+				<div className="relative h-8 w-full bg-fuchsia-400">
 					<div
 						style={{
 							borderTopRightRadius: "100%"
 						}}
-						className="absolute bottom-[-1px] left-[-1px] w-full h-[34px] dark:bg-gray-800 bg-white"
+						className="absolute bottom-[-1px] left-[-1px] h-[34px] w-full bg-white dark:bg-gray-800"
 					></div>
 				</div>
 			</div>
@@ -318,14 +295,11 @@ const SlideOver: React.FC<{
 												<div className="ml-3 flex h-7 items-center">
 													<button
 														type="button"
-														className="rounded-md bg-white text-gray-400 hover:text-gray-500 outline-none"
+														className="rounded-md bg-white text-gray-400 outline-none hover:text-gray-500"
 														onClick={() => setOpen(false)}
 													>
 														<span className="sr-only">Close panel</span>
-														<AiOutlineClose
-															className="h-6 w-6"
-															aria-hidden="true"
-														/>
+														<AiOutlineClose className="h-6 w-6" aria-hidden="true" />
 													</button>
 												</div>
 											</div>
@@ -334,26 +308,26 @@ const SlideOver: React.FC<{
 											{/* Replace with your content */}
 											{!history && <SlideOverEmptyState />}
 											<ul className="divide-y divide-gray-200">
-												{history.map((his, idx) => {
-													const element: { result: string; date: string } =
-														JSON.parse(his);
+												{history &&
+													history.map((his, index) => {
+														const element: { result: string; date: string } = JSON.parse(his);
 
-													return (
-														<li key={idx} className="py-4">
-															<time
-																dateTime={element.date}
-																className="block whitespace-nowrap text-sm text-gray-500 text-right"
-															>
-																{new Date(element.date).toLocaleDateString()}
-															</time>
-															<div className="mt-1">
-																<p className="line-clamp-2 text-sm text-gray-600">
-																	{element.result}
-																</p>
-															</div>
-														</li>
-													);
-												})}
+														return (
+															<li key={index} className="py-4">
+																<time
+																	dateTime={element.date}
+																	className="block whitespace-nowrap text-right text-sm text-gray-500"
+																>
+																	{new Date(element.date).toLocaleDateString()}
+																</time>
+																<div className="mt-1">
+																	<p className="text-sm text-gray-600 line-clamp-2">
+																		{element.result}
+																	</p>
+																</div>
+															</li>
+														);
+													})}
 											</ul>
 											{/* /End replace */}
 										</div>
@@ -370,7 +344,7 @@ const SlideOver: React.FC<{
 
 const SlideOverEmptyState = () => {
 	return (
-		<div className="flex flex-col justify-center items-center h-full text-center">
+		<div className="flex h-full flex-col items-center justify-center text-center">
 			<h3 className="mt-2 text-sm font-medium text-gray-900">No history</h3>
 			<p className="mt-1 text-sm text-gray-500">
 				<span>Looks like your are new here.</span>
@@ -380,7 +354,7 @@ const SlideOverEmptyState = () => {
 			<div className="mt-6">
 				<button
 					type="button"
-					className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-fuchsia-400 hover:bg-fuchsia-700 transition-colors duration-100 ease-in-out"
+					className="inline-flex items-center rounded-md border border-transparent bg-fuchsia-400 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-100 ease-in-out hover:bg-fuchsia-700"
 				>
 					<AiOutlinePlus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
 					Convert Image

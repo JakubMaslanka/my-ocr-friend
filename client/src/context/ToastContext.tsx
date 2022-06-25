@@ -19,9 +19,9 @@ type ToastContextType = {
 let id = 1;
 
 const ToastContext = React.createContext<ToastContextType>({
-	addToast: (c, t) =>
-		console.log(`Addming toast with message: ${c} and type ${t}`),
-	removeToast: (id) => console.log(`Removing toast id: ${id}`)
+	addToast: (message, type) =>
+		console.log(`Addming toast with message: ${message} and type ${type}`),
+	removeToast: (idToRemove) => console.log(`Removing toast id: ${idToRemove}`)
 });
 
 const ToastProvider: React.FC<IToastProvider> = ({ children }) => {
@@ -29,8 +29,8 @@ const ToastProvider: React.FC<IToastProvider> = ({ children }) => {
 
 	const addToast = useCallback(
 		(content: string, type: string) => {
-			setToasts((toasts) => [
-				...toasts,
+			setToasts((previousState) => [
+				...previousState,
 				{
 					id: id++,
 					content,
@@ -42,8 +42,8 @@ const ToastProvider: React.FC<IToastProvider> = ({ children }) => {
 	);
 
 	const removeToast = useCallback(
-		(id: number) => {
-			setToasts((toasts) => toasts.filter((t) => t.id !== id));
+		(idToRemove: number) => {
+			setToasts((previousState) => previousState.filter((toast) => toast.id !== idToRemove));
 		},
 		[setToasts]
 	);

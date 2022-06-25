@@ -14,23 +14,21 @@ interface UseOverlay {
 }
 
 const OverlayProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-	const overlayRootRef = useRef<HTMLElement | null>(null);
+	const overlayRootReference = useRef<HTMLElement | null>(null);
 
-	const handleOverlayContainerRef = useCallback((node: HTMLElement | null) => {
-		overlayRootRef.current = node;
+	const handleOverlayContainerReference = useCallback((node: HTMLElement | null) => {
+		overlayRootReference.current = node;
 	}, []);
 
 	return (
-		<OverlayContext.Provider value={overlayRootRef}>
-			<div id={"overlay-root"} ref={handleOverlayContainerRef} />
+		<OverlayContext.Provider value={overlayRootReference}>
+			<div id={"overlay-root"} ref={handleOverlayContainerReference} />
 			{children}
 		</OverlayContext.Provider>
 	);
 };
 
-const OverlayContext = createContext<
-	MutableRefObject<HTMLElement | null> | undefined
->(undefined);
+const OverlayContext = createContext<MutableRefObject<HTMLElement | null> | undefined>(undefined);
 
 function useOverlay() {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
