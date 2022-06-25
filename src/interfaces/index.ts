@@ -1,2 +1,2 @@
-export { ReadImageRequest } from "./read-image.request";
-export { ReadingImageProgress } from "./reading-image-progress";
+export { ReadImageRequest } from "./read-image.request.interface";
+export { ReadingImageProgress } from "./reading-image-progress.interface";
