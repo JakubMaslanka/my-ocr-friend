@@ -1,4 +1,4 @@
-import type { OCRRequestType } from "../types";
+import type { OCRRequestType } from "src/types";
 
 const url =
 	process.env.NODE_ENV === "production"
