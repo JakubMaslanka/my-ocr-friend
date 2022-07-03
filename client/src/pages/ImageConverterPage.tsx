@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer, useRef, useState } from "react";
+import { v4 as uuid } from "uuid";
 
 import { motion } from "framer-motion";
 import { IoMdCopy } from "react-icons/io";
@@ -71,9 +72,9 @@ const ImageConverterPage: React.FC = () => {
 		)
 			.then((data: APIResponse) => {
 				pushNotification("The photo was converted correctly!", "success");
-				//TODO: move this function outside, add uuid as unique id
+				//TODO: move this function outside
 				setHistory((previousState) => [
-					JSON.stringify({ ...data, date: new Date(Date.now()) }),
+					JSON.stringify({ ...data, date: new Date(Date.now()), id: uuid() }),
 					...previousState
 				]);
 				dispatch({ type: "success", result: data! });

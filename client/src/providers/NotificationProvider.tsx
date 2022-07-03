@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { v4 as uuid } from "uuid";
 import NotificationContainer from "components/molecules/NotificationContainer";
 import type { ToastProps } from "components/atoms/Toast";
 
@@ -6,9 +7,6 @@ type NotificationContextType = {
 	pushNotification: (message: ToastProps["message"], type: ToastProps["type"]) => void;
 	removeNotification: (id: ToastProps["id"]) => void;
 };
-
-//TODO: replace with uuid
-let id = 1;
 
 const NotificationContext = React.createContext<NotificationContextType>({
 	pushNotification: (message, type) =>
@@ -26,7 +24,7 @@ const NotificationProvider: React.FC<{
 			setToasts((previousState) => [
 				...previousState,
 				{
-					id: id++,
+					id: uuid(),
 					message,
 					type
 				}
