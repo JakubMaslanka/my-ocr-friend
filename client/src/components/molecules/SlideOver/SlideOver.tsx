@@ -55,7 +55,7 @@ const SlideOver: React.FC<SlideOverProps> = ({ open, setOpen, history }) => (
 										</div>
 										<div className="relative mt-6 flex-1 px-4 sm:px-6">
 											{/* Replace with your content */}
-											{!history && <SliderEmptyState />}
+											{!history && <SliderEmptyState onClick={() => setOpen(false)} />}
 											<ul className="divide-y divide-gray-200">
 												{history &&
 													history.map((his, index) => {
