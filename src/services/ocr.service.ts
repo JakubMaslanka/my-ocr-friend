@@ -1,19 +1,24 @@
 import { createWorker } from "tesseract.js";
-import { ReadingImageProgress } from "../interfaces";
+import { ReadingImageProgress } from "../types/reading-image-progress.interface";
 
 export class OCRService {
-  public static async readImage(
-    imagePath: string,
-    onProgress?: (status: ReadingImageProgress) => void
-  ): Promise<string> {
-    const worker = createWorker({
-      logger: onProgress ? onProgress : () => null,
-    });
+	public static async readImage(
+		imagePath: string,
+		onProgress?: (status: ReadingImageProgress) => void
+	): Promise<string> {
+		const worker = await createWorker({
+			logger: onProgress ? onProgress : () => null
+		});
 
-    await worker.load();
-    await worker.loadLanguage("eng");
-    await worker.initialize("eng");
+		await worker.loadLanguage("eng");
+		await worker.initialize("eng");
 
-    return worker.recognize(imagePath).then((value) => value.data.text);
-  }
+		const {
+			data: { text }
+		} = await worker.recognize(imagePath);
+
+		await worker.terminate();
+
+		return text;
+	}
 }
