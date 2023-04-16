@@ -48,7 +48,7 @@ var OCRService = (function () {
                 switch (_a.label) {
                     case 0:
                         worker = (0, tesseract_js_1.createWorker)({
-                            logger: onProgress ? onProgress : function () { return null; }
+                            logger: onProgress ? onProgress : function () { return null; },
                         });
                         return [4, worker.load()];
                     case 1:

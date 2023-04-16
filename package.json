@@ -4,14 +4,16 @@
   "description": "This project is the simplest implementation of an OCR converter, based on the Tesseract.js library to transform image characters into the text.",
   "main": "index.js",
   "scripts": {
-    "start:server": "npx nodemon",
-    "start:client": "cd client/ && npm start",
+    "bootstrap": "yarn install && yarn --cwd ./client install",
+    "develop:server": "npx nodemon",
+    "develop:client": "cd client/ && yarn run develop",
     "build:server": "tsc -p .",
-    "build:client": "cd client/ && npm run build",
-    "prod": "node dist/index.js"
+    "build:client": "cd client/ && yarn run build",
+    "lint:client": "cd client/ && yarn run lint",
+    "deploy": "yarn run build:server && yarn run build:client && node dist/index.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Jakub Maslanka",
+  "license": "MIT",
   "dependencies": {
     "cors": "2.8.5",
     "dotenv": "16.0.1",
